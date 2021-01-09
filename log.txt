@@ -1,0 +1,25 @@
+9/1 - https://towardsdatascience.com/web-scraping-yahoo-finance-477fe3daa852 따라하기. 사파리 드라이버를 이용하도록 설정.
+    - 애플 주식에서 현재가는 읽어오기 가능.
+    - td 요소, Market Cap은 동일한 방법으로 못 읽어본다.
+
+9/2 - 책 코드 참고. 어제 코드보다 훨씬 더 간단하고, 사파리도 거치지 않아 가볍게 돌아간다.
+    - HTML 에 대한 기본적인 이해가 필요한 것 같다.
+
+9/3 - 낭패다. 빌려온 책은 HTML이 아니라 HTTP 책이었다.
+    - genlib에서 html 기본서를 다운받고 있다.
+    - 필요한 정보 받아오는 건 성공
+    - 추후 탐구: shell에 주식 명 입력하면 그것 출력하는 것 ; 엑셀로 출력하는것 ; 데이터 누적 후 시각화?
+
+
+------------
+
+
+Kaggle Dataset. 
+
+train with this one. / output; tommorrow open higher than close? (T/F)
+
+test with new collected
+
+feed in. 30 day info. 
+
+-> how to create gitignore
