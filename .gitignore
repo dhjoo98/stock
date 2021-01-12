@@ -1,3 +1,6 @@
 *.xml
 *.xlsx
 **/.idea
+**/archive
+*.npy
+*.txt
