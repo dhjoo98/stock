@@ -12,52 +12,34 @@ from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, LSTM
 import pandas as pd #load csv
-
+'''
 data = pd.read_csv("/Users/dhjoo/Desktop/Workspace/stock/archive/individual_stocks_5yr/individual_stocks_5yr/AAPL_data.csv")
 
-'''
-data.iloc[:,6]=data.iloc[:,4]-data.iloc[:,1]
-for i in range(len(data.iloc[:,6])):
-  if data.iloc[i,6] > 0:
-    data.iloc[i,6] = 0 #상승
-  else:
-    data.iloc[i,6] = 1 #하락
-'''
 data.iloc[:,6] = np.where(data.iloc[:,4]-data.iloc[:,1] > 0, [0], [1]) #pythonic
 
 #pd.to_pickle(data, "./with_label") no need to load data with pickle, thus getting rid of unnecessary iloc
 np.save('labeled_data',data)
-
+'''
 #labeled = pd.read_pickle("with_label") #-> cannot input to model
 labeled = np.load("labeled_data.npy",allow_pickle=True) #-> straight input to model
 
-'''
-using pandas
-train_data = labeled.iloc[:1000,:]
-test_data = labeled.iloc[1000:,:]
-'''
-train_data = labeled[:1000,:]
-test_data = labeled[1000:,:]
+print(labeled.shape)
 
-'''
-not continuous data
-train_data_stack = np.array(train_data.iloc[:,1:6])
-train_data_stack = train_data_stack.reshape([-1,100])
-'''
+data_stack = np.zeros((labeled.shape[0]-19,100))
+for i in range(labeled.shape[0]-19):
+    data_stack[i,:] = labeled[i:i+20,1:6].reshape([-1,100])
+label = labeled[19:,6]
+print(data_stack.__class__, label.shape)
+sum = np.hstack((data_stack,label.reshape((1240,1))))
 
-#train_data_np = np.array(train_data)
-train_data_np = train_data
-train_data_stack = np.zeros((1000-19,100))
-for i in range(1000-19):
-  train_data_stack[i,:] = train_data_np[i:i+20,1:6].reshape([-1,100])
-train_label = train_data_np[19:,6]
-
-#test_data_np = np.array(test_data)
-test_data_np = test_data
-test_data_stack = np.zeros((259-19,100))
-for i in range(259-19):
-  test_data_stack[i,:] = test_data_np[i:i+20,1:6].reshape([-1,100])
-test_label = test_data_np[19:,6]
+#shuffle
+np.random.shuffle(sum) #direct shuffling of sum
+print(sum.shape)
+train_data = sum[:1000,:-1]
+test_data = sum[1000:,:-1]
+train_label = sum[:1000,-1]
+test_label = sum[1000:,-1]
+print(train_label.shape)
 
 encoder = {k:v for v,k in enumerate([0,1])}
 y_train = [encoder[i] for i in train_label]
@@ -65,7 +47,7 @@ y_train = keras.utils.to_categorical(y_train)
 y_test = [encoder[i] for i in test_label]
 y_test = keras.utils.to_categorical(y_test)
 
-print("finished")
+print("data is prepared")
 
 model = Sequential()
 model.add(Dense(100, activation='relu', input_shape=(100,)))
@@ -79,7 +61,7 @@ model.compile(loss='mean_squared_error',
               optimizer='adam',
               metrics=['accuracy'])
 
-hist = model.fit(train_data_stack, y_train,
+hist = model.fit(train_data, y_train,
                     batch_size=10,
                     epochs=100,
                     verbose=0)
