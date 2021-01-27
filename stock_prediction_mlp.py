@@ -21,7 +21,7 @@ data.iloc[:,6] = np.where(data.iloc[:,4]-data.iloc[:,1] > 0, [0], [1]) #pythonic
 np.save('labeled_data',data)
 '''
 #labeled = pd.read_pickle("with_label") #-> cannot input to model
-labeled = np.load("labeled_data.npy",allow_pickle=True) #-> straight input to model
+labeled = np.load("./labeled_data.npy",allow_pickle=True) #-> straight input to model
 
 print(labeled.shape)
 
@@ -39,7 +39,8 @@ train_data = sum[:1000,:-1]
 test_data = sum[1000:,:-1]
 train_label = sum[:1000,-1]
 test_label = sum[1000:,-1]
-print(train_label.shape)
+print(train_data.shape,train_label.shape)
+print(test_data.shape, test_label.shape)
 
 encoder = {k:v for v,k in enumerate([0,1])}
 y_train = [encoder[i] for i in train_label]
@@ -60,12 +61,17 @@ model.add(Dense(2, activation='softmax'))
 model.compile(loss='mean_squared_error',
               optimizer='adam',
               metrics=['accuracy'])
+#to resolve "Failed to convert a NumPy array to a Tensor (Unsupported object type float)."
+train_data = np.asarray(train_data).astype('float32')
+y_train = np.asarray(y_train).astype('float32')
+test_data = np.asarray(test_data).astype('float32')
+y_test = np.asarray(y_test).astype('float32')
 
 hist = model.fit(train_data, y_train,
                     batch_size=10,
                     epochs=100,
                     verbose=0)
 
-score = model.evaluate(test_data_stack, y_test, verbose=0)
+score = model.evaluate(test_data, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
