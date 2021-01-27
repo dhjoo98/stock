@@ -4,3 +4,4 @@
 **/archive
 *.npy
 *.txt
+.DS_Store
